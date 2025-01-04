@@ -24,13 +24,29 @@ const CreateMessageService = async ({
 }: Request): Promise<{ message: Message; body: string }> => {
   await Message.upsert(messageData);
 
+  const ticket = await Ticket.findOne({
+    where: {
+      id: messageData.ticketId,
+    }
+  });
+
+  if (ticket) {
+    await ticket.update({
+      status: "open",
+      userId: null,
+      unreadMessages: 0,
+    });
+  }
+
   let responseBody = "";
 
   if (messageData?.fromMe === false && "fromMe" in messageData) {
     const { data } = await getIA.post("/conversation", {
       ticketID: messageData.ticketId,
       userMessage: messageData.body,
+      messageID: messageData.id,
     });
+
     responseBody = data.message;
   }
 

@@ -28,14 +28,7 @@ const FindOrCreateTicketService = async (
     }
   });
   
-  if (contact.number == "573228593894") {
-    logger.info(`FindOrCreateTicketService -> ticket ${ticket}`);
-  }
-
   if (ticket) {
-    if (contact.number == "573228593894") {
-      logger.info(`Ticket found 3-> ticket ${ticket}`);
-    }
     await ticket.update({ unreadMessages });
   }
 
