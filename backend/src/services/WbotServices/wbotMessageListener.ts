@@ -80,7 +80,8 @@ function makeRandomId(length: number) {
 const verifyMediaMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
-  contact: Contact
+  contact: Contact,
+  wbot: Session
 ): Promise<Message> => {
   const quotedMsg = await verifyQuotedMessage(msg);
 
@@ -105,7 +106,7 @@ const verifyMediaMessage = async (
       media.data,
       "base64"
     );
-  } catch (err) {
+  } catch (err: any) {
     Sentry.captureException(err);
     logger.error(err);
   }
@@ -123,15 +124,19 @@ const verifyMediaMessage = async (
   };
 
   await ticket.update({ lastMessage: msg.body || media.filename });
-  const newMessage = await CreateMessageService({ messageData });
 
-  return newMessage;
+  
+  const newMessage = await CreateMessageService({ messageData });
+  await wbot.sendMessage(`${contact.number}@c.us`, newMessage.body);
+
+  return newMessage.message;
 };
 
 const verifyMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
-  contact: Contact
+  contact: Contact,
+  wbot: Session
 ) => {
 
   if (msg.type === 'location')
@@ -153,7 +158,9 @@ const verifyMessage = async (
   // @ts-ignore
   await ticket.update({ lastMessage: msg.type === "location" ? msg.location.description ? "Localization - " + msg.location.description.split('\\n')[0] : "Localization" : msg.body });
 
-  await CreateMessageService({ messageData });
+  const newMessage = await CreateMessageService({ messageData });
+
+  await wbot.sendMessage(`${contact.number}@c.us`, newMessage.body);
 };
 
 const prepareLocation = (msg: WbotMessage): WbotMessage => {
@@ -199,7 +206,7 @@ const verifyQueue = async (
 
     const sentMessage = await wbot.sendMessage(`${contact.number}@c.us`, body);
 
-    await verifyMessage(sentMessage, ticket, contact);
+    await verifyMessage(sentMessage, ticket, contact, wbot);
   } else {
     let options = "";
 
@@ -215,7 +222,7 @@ const verifyQueue = async (
           `${contact.number}@c.us`,
           body
         );
-        verifyMessage(sentMessage, ticket, contact);
+        verifyMessage(sentMessage, ticket, contact, wbot);
       },
       3000,
       ticket.id
@@ -308,9 +315,9 @@ const handleMessage = async (
     );
 
     if (msg.hasMedia) {
-      await verifyMediaMessage(msg, ticket, contact);
+      await verifyMediaMessage(msg, ticket, contact, wbot);
     } else {
-      await verifyMessage(msg, ticket, contact);
+      await verifyMessage(msg, ticket, contact, wbot);
     }
 
     if (

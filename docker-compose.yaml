@@ -20,6 +20,7 @@ services:
       - BACKEND_PUBLIC_DIR=${BACKEND_PUBLIC_DIR}
       - BACKEND_WWEBJS_AUTH_DIR=${BACKEND_WWEBJS_AUTH_DIR}
       - CHROME_ARGS=${CHROME_ARGS}
+      - IA_URL=${IA_URL}
     volumes:
       - ${BACKEND_PUBLIC_DIR}:/usr/src/app/public/
       - ${BACKEND_WWEBJS_AUTH_DIR}:/usr/src/app/.wwebjs_auth/

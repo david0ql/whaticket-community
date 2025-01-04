@@ -1,3 +1,4 @@
+import { getIA } from "../../api/ia";
 import { getIO } from "../../libs/socket";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
@@ -19,8 +20,13 @@ interface Request {
 
 const CreateMessageService = async ({
   messageData
-}: Request): Promise<Message> => {
+}: Request): Promise<{message: Message, body: string}> => {
   await Message.upsert(messageData);
+
+  const { data } = await getIA.post("/conversation", {
+    ticketID: messageData.ticketId,
+    userMessage: messageData.body
+  })
 
   const message = await Message.findByPk(messageData.id, {
     include: [
@@ -60,7 +66,10 @@ const CreateMessageService = async ({
       contact: message.ticket.contact
     });
 
-  return message;
+  return {
+    message,
+    body: data.message
+  };
 };
 
 export default CreateMessageService;
