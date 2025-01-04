@@ -127,7 +127,11 @@ const verifyMediaMessage = async (
 
   
   const newMessage = await CreateMessageService({ messageData });
-  await wbot.sendMessage(`${contact.number}@c.us`, newMessage.body);
+
+  if (newMessage.body !== "") {
+    await wbot.sendMessage(`${contact.number}@c.us`, newMessage.body);
+  };
+
 
   return newMessage.message;
 };
@@ -160,7 +164,9 @@ const verifyMessage = async (
 
   const newMessage = await CreateMessageService({ messageData });
 
-  await wbot.sendMessage(`${contact.number}@c.us`, newMessage.body);
+  if (newMessage.body !== "") {
+    await wbot.sendMessage(`${contact.number}@c.us`, newMessage.body);
+  }
 };
 
 const prepareLocation = (msg: WbotMessage): WbotMessage => {

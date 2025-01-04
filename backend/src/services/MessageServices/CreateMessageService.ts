@@ -14,19 +14,25 @@ interface MessageData {
   mediaType?: string;
   mediaUrl?: string;
 }
+
 interface Request {
   messageData: MessageData;
 }
 
 const CreateMessageService = async ({
-  messageData
-}: Request): Promise<{message: Message, body: string}> => {
+  messageData,
+}: Request): Promise<{ message: Message; body: string }> => {
   await Message.upsert(messageData);
 
-  const { data } = await getIA.post("/conversation", {
-    ticketID: messageData.ticketId,
-    userMessage: messageData.body
-  })
+  let responseBody = "";
+
+  if (messageData?.fromMe === false && "fromMe" in messageData) {
+    const { data } = await getIA.post("/conversation", {
+      ticketID: messageData.ticketId,
+      userMessage: messageData.body,
+    });
+    responseBody = data.message;
+  }
 
   const message = await Message.findByPk(messageData.id, {
     include: [
@@ -35,20 +41,21 @@ const CreateMessageService = async ({
         model: Ticket,
         as: "ticket",
         include: [
-          "contact", "queue",
+          "contact",
+          "queue",
           {
             model: Whatsapp,
             as: "whatsapp",
-            attributes: ["name"]
-          }
-        ]
+            attributes: ["name"],
+          },
+        ],
       },
       {
         model: Message,
         as: "quotedMsg",
-        include: ["contact"]
-      }
-    ]
+        include: ["contact"],
+      },
+    ],
   });
 
   if (!message) {
@@ -63,12 +70,12 @@ const CreateMessageService = async ({
       action: "create",
       message,
       ticket: message.ticket,
-      contact: message.ticket.contact
+      contact: message.ticket.contact,
     });
 
   return {
     message,
-    body: data.message
+    body: responseBody,
   };
 };
 
