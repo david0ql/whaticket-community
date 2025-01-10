@@ -296,7 +296,6 @@ const handleMessage = async (
       whatsapp.farewellMessage &&
       formatBody(whatsapp.farewellMessage, contact) === msg.body
     ) {
-      console.log("Farewell message received");
       return;
     }
 

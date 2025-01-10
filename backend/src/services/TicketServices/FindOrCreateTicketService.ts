@@ -3,7 +3,6 @@ import { Op } from "sequelize";
 import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
 import ShowTicketService from "./ShowTicketService";
-import { logger } from "../../utils/logger";
 
 const FindOrCreateTicketService = async (
   contact: Contact,
@@ -11,13 +10,6 @@ const FindOrCreateTicketService = async (
   unreadMessages: number,
   groupContact?: Contact
 ): Promise<Ticket> => {
-  if (contact.number == "573228593894") {
-    logger.info(`FindOrCreateTicketService -> contact ${contact}`);
-    logger.info(`FindOrCreateTicketService -> whatsappId ${whatsappId}`);
-    logger.info(`FindOrCreateTicketService -> unreadMessages ${unreadMessages}`);
-    logger.info(`FindOrCreateTicketService -> groupContact ${groupContact}`);
-  }
-
   let ticket = await Ticket.findOne({
     where: {
       status: {
@@ -28,14 +20,7 @@ const FindOrCreateTicketService = async (
     }
   });
   
-  if (contact.number == "573228593894") {
-    logger.info(`FindOrCreateTicketService -> ticket ${ticket}`);
-  }
-
   if (ticket) {
-    if (contact.number == "573228593894") {
-      logger.info(`Ticket found 3-> ticket ${ticket}`);
-    }
     await ticket.update({ unreadMessages });
   }
 
@@ -47,10 +32,6 @@ const FindOrCreateTicketService = async (
       },
       order: [["updatedAt", "DESC"]]
     });
-
-    if (contact.number == "573228593894") {
-      logger.info(`Ticket found 1-> ticket ${ticket}`);
-    }
 
     if (ticket) {
       await ticket.update({
@@ -73,10 +54,6 @@ const FindOrCreateTicketService = async (
       order: [["updatedAt", "DESC"]]
     });
 
-    if (contact.number == "573228593894") {
-      logger.info(`Ticket found 2-> ticket ${ticket}`);
-    }
-
     if (ticket) {
       await ticket.update({
         status: "pending",
@@ -94,10 +71,6 @@ const FindOrCreateTicketService = async (
       unreadMessages,
       whatsappId
     });
-  }
-
-  if (contact.number == "573228593894") {
-    logger.info(`Ticket created -> ticket ${ticket}`);
   }
 
   ticket = await ShowTicketService(ticket.id);

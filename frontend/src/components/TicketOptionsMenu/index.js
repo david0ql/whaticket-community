@@ -60,6 +60,8 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		} catch (err) {
 			toastError(err);
 		}
+
+		handleClose();
 	};
 
 	const handleCloseTransferTicketModal = () => {

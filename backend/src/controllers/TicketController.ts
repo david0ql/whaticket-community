@@ -91,7 +91,9 @@ export const exportExcel = async (req: Request, res: Response): Promise<Response
   try {
     const messages = await ExportTicketService(ticketId);
 
-    const worksheet = XLSX.utils.json_to_sheet(messages);
+    const plainMessages = messages.map(message => message.toJSON());
+
+    const worksheet = XLSX.utils.json_to_sheet(plainMessages);
     const workbook = XLSX.utils.book_new();
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Messages");
