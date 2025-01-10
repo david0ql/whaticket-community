@@ -309,6 +309,8 @@ const handleMessage = async (
     const milliseconds = msg.timestamp * 1000;
     const minutes = new Date(milliseconds).getMinutes();
 
+    console.log(minutes, msg.fromMe, ticketCreated);
+
     if (minutes < 5 && !msg.fromMe && ticketCreated) {
       await wbot.sendMessage(`${contact.number}@c.us`, whatsapp.greetingMessage);
     }
