@@ -64,7 +64,7 @@ const createContact = async (
   }
 
   logger.info(`Createcontact -> whatsapp: ${whatsapp}`);
-  const createTicket = await FindOrCreateTicketService(
+  const { ticket: createTicket } = await FindOrCreateTicketService(
     contact,
     whatsapp.id,
     1

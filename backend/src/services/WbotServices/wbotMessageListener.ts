@@ -299,12 +299,21 @@ const handleMessage = async (
       return;
     }
 
-    const ticket = await FindOrCreateTicketService(
+    const { ticket, ticketCreated } = await FindOrCreateTicketService(
       contact,
       wbot.id!,
       unreadMessages,
       groupContact
     );
+    
+    const milliseconds = msg.timestamp * 1000;
+    const minutes = new Date(milliseconds).getMinutes();
+
+    if (minutes < 5 && !msg.fromMe && ticketCreated) {
+      const body = formatBody(`\u200e${whatsapp.greetingMessage}`, contact);
+
+      await wbot.sendMessage(`${contact.number}@c.us`, body);
+    }
 
     if (msg.hasMedia) {
       await verifyMediaMessage(msg, ticket, contact);

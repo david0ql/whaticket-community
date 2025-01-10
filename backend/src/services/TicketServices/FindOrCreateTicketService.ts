@@ -9,7 +9,8 @@ const FindOrCreateTicketService = async (
   whatsappId: number,
   unreadMessages: number,
   groupContact?: Contact
-): Promise<Ticket> => {
+): Promise<{ ticket: Ticket, ticketCreated: boolean }> => {
+  let ticketCreated = false;
   let ticket = await Ticket.findOne({
     where: {
       status: {
@@ -19,7 +20,7 @@ const FindOrCreateTicketService = async (
       whatsappId: whatsappId
     }
   });
-  
+
   if (ticket) {
     await ticket.update({ unreadMessages });
   }
@@ -64,6 +65,8 @@ const FindOrCreateTicketService = async (
   }
 
   if (!ticket) {
+    ticketCreated = true;
+
     ticket = await Ticket.create({
       contactId: groupContact ? groupContact.id : contact.id,
       status: "pending",
@@ -75,7 +78,10 @@ const FindOrCreateTicketService = async (
 
   ticket = await ShowTicketService(ticket.id);
 
-  return ticket;
+  return {
+    ticket,
+    ticketCreated
+  };
 };
 
 export default FindOrCreateTicketService;
