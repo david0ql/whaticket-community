@@ -310,9 +310,7 @@ const handleMessage = async (
     const minutes = new Date(milliseconds).getMinutes();
 
     if (minutes < 5 && !msg.fromMe && ticketCreated) {
-      const body = formatBody(`\u200e${whatsapp.greetingMessage}`, contact);
-
-      await wbot.sendMessage(`${contact.number}@c.us`, body);
+      await wbot.sendMessage(`${contact.number}@c.us`, whatsapp.greetingMessage);
     }
 
     if (msg.hasMedia) {
