@@ -306,8 +306,7 @@ const handleMessage = async (
       groupContact
     );
     
-    const milliseconds = msg.timestamp * 1000;
-    const minutes = new Date(milliseconds).getMinutes();
+    const minutes = new Date(msg.timestamp).getMinutes();
 
     console.log(minutes, msg.fromMe, ticketCreated);
 
