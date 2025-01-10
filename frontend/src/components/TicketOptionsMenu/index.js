@@ -41,6 +41,27 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		handleClose();
 	};
 
+	const handleOpenExportModal = async () => {
+		try {
+			const response = await api.post(`/tickets/export/${ticket.id}`, null, {
+				responseType: 'blob'
+			});
+	
+			const url = window.URL.createObjectURL(new Blob([response.data]));
+			const link = document.createElement("a");
+
+			link.href = url;
+			link.setAttribute("download", `ticket_${ticket.id}.xlsx`);
+
+			document.body.appendChild(link);
+
+			link.click();
+			link.parentNode.removeChild(link);
+		} catch (err) {
+			toastError(err);
+		}
+	};
+
 	const handleCloseTransferTicketModal = () => {
 		if (isMounted.current) {
 			setTransferTicketModalOpen(false);
@@ -77,6 +98,9 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 						</MenuItem>
 					)}
 				/>
+				<MenuItem onClick={handleOpenExportModal}>
+					{i18n.t("ticketOptionsMenu.export")}
+				</MenuItem>
 			</Menu>
 			<ConfirmationModal
 				title={`${i18n.t("ticketOptionsMenu.confirmationModal.title")}${

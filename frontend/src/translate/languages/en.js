@@ -398,6 +398,7 @@ const messages = {
       ticketOptionsMenu: {
         delete: "Delete",
         transfer: "Transfer",
+        export: "Export",
         confirmationModal: {
           title: "Delete ticket #",
           titleFrom: "from contact ",

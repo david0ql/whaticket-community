@@ -105,7 +105,7 @@ const verifyMediaMessage = async (
       media.data,
       "base64"
     );
-  } catch (err) {
+  } catch (err: any) {
     Sentry.captureException(err);
     logger.error(err);
   }
@@ -450,7 +450,6 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
 
 const wbotMessageListener = (wbot: Session): void => {
   wbot.on("message_create", async msg => {
-    logger.info(`Message received: ${msg.body}`);
     handleMessage(msg, wbot);
   });
 

@@ -3,13 +3,15 @@ import { getIO } from "../libs/socket";
 
 import CreateTicketService from "../services/TicketServices/CreateTicketService";
 import DeleteTicketService from "../services/TicketServices/DeleteTicketService";
+import ExportTicketService from "../services/TicketServices/ExportTicketService";
 import ListTicketsService from "../services/TicketServices/ListTicketsService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
 import formatBody from "../helpers/Mustache";
-import { logger } from "../utils/logger";
+
+import * as XLSX from "xlsx";
 
 type IndexQuery = {
   searchParam: string;
@@ -83,6 +85,28 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(contact);
 };
 
+export const exportExcel = async (req: Request, res: Response): Promise<Response | void> => {
+  const { ticketId } = req.params;
+
+  try {
+    const messages = await ExportTicketService(ticketId);
+
+    const worksheet = XLSX.utils.json_to_sheet(messages);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Messages");
+
+    const excelBuffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+
+    res.setHeader("Content-Disposition", `attachment; filename=ticket_${ticketId}.xlsx`);
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+    return res.status(200).send(excelBuffer);
+  } catch (error: any) {
+    return res.status(500).json({ error });
+  }
+};
+
 export const update = async (
   req: Request,
   res: Response
@@ -94,8 +118,6 @@ export const update = async (
     ticketData,
     ticketId
   });
-
-  logger.info("update -> ticket", ticket);
 
   if (ticket.status === "closed") {
     const whatsapp = await ShowWhatsAppService(ticket.whatsappId);

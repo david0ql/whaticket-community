@@ -404,6 +404,7 @@ const messages = {
       ticketOptionsMenu: {
         delete: "Borrar",
         transfer: "Transferir",
+        export: "Exportar",
         confirmationModal: {
           title: "¿Borrar ticket #",
           titleFrom: "del contacto ",

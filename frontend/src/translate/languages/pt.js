@@ -403,6 +403,7 @@ const messages = {
       ticketOptionsMenu: {
         delete: "Deletar",
         transfer: "Transferir",
+        export: "Exportar",
         confirmationModal: {
           title: "Deletar o ticket do contato",
           message:
