@@ -52,6 +52,9 @@ class User extends Model<User> {
   @Column
   whatsappId: number;
 
+  @Column
+  isConnected: number
+
   @BelongsTo(() => Whatsapp)
   whatsapp: Whatsapp;
 

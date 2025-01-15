@@ -4,6 +4,7 @@ import { verify } from "jsonwebtoken";
 import AppError from "../errors/AppError";
 import { logger } from "../utils/logger";
 import authConfig from "../config/auth";
+import User from "../models/User";
 
 let io: SocketIO;
 
@@ -14,7 +15,7 @@ export const initIO = (httpServer: Server): SocketIO => {
     }
   });
 
-  io.on("connection", socket => {
+  io.on("connection", async socket => {
     const { token } = socket.handshake.query;
     let tokenData = null;
     try {
@@ -22,11 +23,25 @@ export const initIO = (httpServer: Server): SocketIO => {
       logger.debug(JSON.stringify(tokenData), "io-onConnection: tokenData");
     } catch (error) {
       logger.error(JSON.stringify(error), "Error decoding token");
-      socket.disconnect();
+      if (socket.readyState === 1) {
+        socket.disconnect();
+      }
       return io;
     }
 
+    socket.user = tokenData;
+
     logger.info("Client Connected");
+
+    if (socket.user?.id) {
+      const user = await User.findByPk(socket.user.id)
+
+      if (user) {
+        user.isConnected = 1;
+        await user.save();
+      }
+    }
+
     socket.on("joinChatBox", (ticketId: string) => {
       logger.info("A client joined a ticket channel");
       socket.join(ticketId);
@@ -42,7 +57,15 @@ export const initIO = (httpServer: Server): SocketIO => {
       socket.join(status);
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async () => {
+      if (socket.user?.id) {
+        const user = await User.findByPk(socket.user.id)
+
+        if (user) {
+          user.isConnected = 0;
+          await user.save();
+        }
+      }
       logger.info("Client disconnected");
     });
 

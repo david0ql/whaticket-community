@@ -29,6 +29,7 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
+import { Cancel, CheckCircle } from "@material-ui/icons";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_USERS") {
@@ -135,7 +136,9 @@ const Users = () => {
     });
 
     return () => {
-      socket.disconnect();
+      if (socket.readyState === 1) {
+        socket.disconnect();
+      }
     };
   }, []);
 
@@ -245,7 +248,7 @@ const Users = () => {
               </TableCell>
               <TableCell align="center">
                 {i18n.t("users.table.whatsapp")}
-              </TableCell>              
+              </TableCell>
               <TableCell align="center">
                 {i18n.t("users.table.actions")}
               </TableCell>
@@ -255,7 +258,25 @@ const Users = () => {
             <>
               {users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell align="center">{user.name}</TableCell>
+                  <TableCell
+                    align="center"
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    <span>{user.name}</span>
+                    {user.isConnected === 1 ? (
+                      <CheckCircle
+                        style={{ color: "green", fontSize: "24px" }}
+                      />
+                    ) : (
+                      <Cancel style={{ color: "red", fontSize: "24px" }} />
+                    )}
+                  </TableCell>
                   <TableCell align="center">{user.email}</TableCell>
                   <TableCell align="center">{user.profile}</TableCell>
                   <TableCell align="center">{user.whatsapp?.name}</TableCell>

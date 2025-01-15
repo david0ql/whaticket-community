@@ -131,7 +131,9 @@ const Ticket = () => {
     });
 
     return () => {
-      socket.disconnect();
+      if (socket.readyState === 1) {
+        socket.disconnect();
+      }
     };
   }, [ticketId, history]);
 

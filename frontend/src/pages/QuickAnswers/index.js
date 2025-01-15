@@ -138,7 +138,9 @@ const QuickAnswers = () => {
     });
 
     return () => {
-      socket.disconnect();
+      if (socket.readyState === 1) {
+        socket.disconnect();
+      }
     };
   }, []);
 
