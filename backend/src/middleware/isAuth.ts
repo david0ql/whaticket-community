@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import AppError from "../errors/AppError";
 import authConfig from "../config/auth";
 
-interface TokenPayload {
+export interface TokenPayload {
   id: string;
   username: string;
   profile: string;

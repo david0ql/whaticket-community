@@ -29,7 +29,7 @@ import TableRowSkeleton from "../../components/TableRowSkeleton";
 import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
-import { Cancel, CheckCircle } from "@material-ui/icons";
+import { Cancel, CheckCircle, Warning } from "@material-ui/icons";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_USERS") {
@@ -269,10 +269,12 @@ const Users = () => {
                     }}
                   >
                     <span>{user.name}</span>
-                    {user.isConnected === 1 ? (
+                    {user.finalIsConnected === 1 ? (
                       <CheckCircle
                         style={{ color: "green", fontSize: "24px" }}
                       />
+                    ) : user.finalIsConnected === 3 ? (
+                      <Warning style={{ color: "orange", fontSize: "24px" }} />
                     ) : (
                       <Cancel style={{ color: "red", fontSize: "24px" }} />
                     )}

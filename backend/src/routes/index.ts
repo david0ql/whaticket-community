@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { verify } from "jsonwebtoken";
 
 import userRoutes from "./userRoutes";
 import authRoutes from "./authRoutes";
@@ -11,19 +12,52 @@ import whatsappSessionRoutes from "./whatsappSessionRoutes";
 import queueRoutes from "./queueRoutes";
 import quickAnswerRoutes from "./quickAnswerRoutes";
 import apiRoutes from "./apiRoutes";
+import authConfig from "../config/auth";
+import AppError from "../errors/AppError";
+import { TokenPayload } from "../middleware/isAuth";
+import Interaction from "../models/Interaction";
 
 const routes = Router();
 
-routes.use(userRoutes);
+const interactionRouter = Router();
+
+interactionRouter.use(async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        throw new AppError("ERR_SESSION_EXPIRED", 401);
+    }
+
+    try {
+        const [, token] = authHeader.split(" ");
+
+        const decoded = verify(token, authConfig.secret);
+
+        const { id } = decoded as TokenPayload;
+
+        await Interaction.create({
+            userId: id,
+        })
+    } catch (error) {
+        throw new AppError("ERR_SESSION_EXPIRED", 401);
+    }
+
+    next();
+});
+
+interactionRouter.use(userRoutes);
+interactionRouter.use(settingRoutes);
+interactionRouter.use(contactRoutes);
+interactionRouter.use(ticketRoutes);
+interactionRouter.use(whatsappRoutes);
+interactionRouter.use(messageRoutes);
+interactionRouter.use(whatsappSessionRoutes);
+interactionRouter.use(queueRoutes);
+interactionRouter.use(quickAnswerRoutes);
+interactionRouter.use("/api/messages", apiRoutes);
+
 routes.use("/auth", authRoutes);
-routes.use(settingRoutes);
-routes.use(contactRoutes);
-routes.use(ticketRoutes);
-routes.use(whatsappRoutes);
-routes.use(messageRoutes);
-routes.use(whatsappSessionRoutes);
-routes.use(queueRoutes);
-routes.use(quickAnswerRoutes);
-routes.use("/api/messages", apiRoutes);
+
+routes.use(interactionRouter);
 
 export default routes;

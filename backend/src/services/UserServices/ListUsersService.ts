@@ -2,22 +2,18 @@ import { Sequelize, Op } from "sequelize";
 import Queue from "../../models/Queue";
 import User from "../../models/User";
 import Whatsapp from "../../models/Whatsapp";
+import sequelize from "../../database";
+import Interaction from "../../models/Interaction";
 
 interface Request {
   searchParam?: string;
   pageNumber?: string | number;
 }
 
-interface Response {
-  users: User[];
-  count: number;
-  hasMore: boolean;
-}
-
 const ListUsersService = async ({
   searchParam = "",
   pageNumber = "1"
-}: Request): Promise<Response> => {
+}: Request): Promise<any> => {
   const whereCondition = {
     [Op.or]: [
       {
@@ -42,15 +38,41 @@ const ListUsersService = async ({
     include: [
       { model: Queue, as: "queues", attributes: ["id", "name", "color"] },
       { model: Whatsapp, as: "whatsapp", attributes: ["id", "name"] },
-    ]
+    ],
   });
+
+  const usersWithFinalState = await Promise.all(
+    users.map(async (user) => {
+      if (user.isConnected === 1) {
+        const lastInteraction = await Interaction.findOne({
+          where: { userId: user.id },
+          order: [["createdAt", "DESC"]],
+        });
+
+        if (lastInteraction) {
+          const lastInteractionTime = new Date(lastInteraction.createdAt).getTime();
+          const currentTime = Date.now();
+          const timeDifferenceInSeconds = (currentTime - lastInteractionTime) / 1000;
+
+          if (timeDifferenceInSeconds > 120) {
+            return { ...user.toJSON(), finalIsConnected: 3 };
+          }
+        }
+      }
+
+      return {
+        ...user.toJSON(),
+        finalIsConnected: user.isConnected,
+      };
+    })
+  );
 
   const hasMore = count > offset + users.length;
 
   return {
-    users,
+    users: usersWithFinalState,
     count,
-    hasMore
+    hasMore,
   };
 };
 

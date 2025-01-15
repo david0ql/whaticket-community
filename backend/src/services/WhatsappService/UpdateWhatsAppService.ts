@@ -15,6 +15,8 @@ interface WhatsappData {
   notAvailableMessage?: string;
   farewellMessage?: string;
   queueIds?: number[];
+  startHour?: string;
+  endHour?: string;
 }
 
 interface Request {
@@ -45,6 +47,8 @@ const UpdateWhatsAppService = async ({
     greetingMessage,
     farewellMessage,
     notAvailableMessage,
+    startHour,
+    endHour,
     queueIds = []
   } = whatsappData;
 
@@ -78,7 +82,9 @@ const UpdateWhatsAppService = async ({
     greetingMessage,
     farewellMessage,
     isDefault,
-    notAvailableMessage
+    notAvailableMessage,
+    startHour,
+    endHour
   });
 
   await AssociateWhatsappQueue(whatsapp, queueIds);

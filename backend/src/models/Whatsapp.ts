@@ -56,6 +56,12 @@ class Whatsapp extends Model<Whatsapp> {
   @Column(DataType.TEXT)
   notAvailableMessage: string;
 
+  @Column(DataType.TEXT)
+  startHour: string;
+
+  @Column(DataType.TEXT)
+  endHour: string;
+
   @Default(false)
   @AllowNull
   @Column
