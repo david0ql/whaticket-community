@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import moment from "moment";
 import openSocket from "../../services/socket-io";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -97,8 +98,18 @@ const Settings = () => {
   };
 
   const getSettingValue = (key) => {
-    const { value } = settings.find((s) => s.key === key);
-    return value;
+    const setting = settings.find((s) => s.key === key);
+    return setting ? setting.value : null;
+  };
+
+  const handleTimeChange = async (key, date) => {
+    try {
+      const formattedTime = moment(date).format("hh:mm A");
+      await api.put(`/settings/${key}`, { value: formattedTime });
+      toast.success(i18n.t("settings.success"));
+    } catch (err) {
+      toastError(err);
+    }
   };
 
   return (
@@ -157,9 +168,12 @@ const Settings = () => {
               margin="dense"
               variant="outlined"
               value={
-                settings && settings.length > 0 && getSettingValue("startHour")
+                settings &&
+                settings.length > 0 &&
+                moment(getSettingValue("startHour"), "hh:mm A").toDate()
               }
-              onChange={handleChangeSetting}
+              onChange={(date) => handleTimeChange("startHour", date)}
+              ampm
             />
             <TimePicker
               name="endHour"
@@ -167,9 +181,12 @@ const Settings = () => {
               margin="dense"
               variant="outlined"
               value={
-                settings && settings.length > 0 && getSettingValue("endHour")
+                settings &&
+                settings.length > 0 &&
+                moment(getSettingValue("endHour"), "hh:mm A").toDate()
               }
-              onChange={handleChangeSetting}
+              onChange={(date) => handleTimeChange("endHour", date)}
+              ampm
             />
           </Paper>
         </Container>
