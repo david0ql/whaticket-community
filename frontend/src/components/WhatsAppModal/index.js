@@ -63,7 +63,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
     name: "",
     greetingMessage: "",
     farewellMessage: "",
-	notAvailableMessage: "",
+    notAvailableMessage: "",
     isDefault: false,
   };
   const [whatsApp, setWhatsApp] = useState(initialState);
@@ -188,7 +188,8 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                     fullWidth
                     name="notAvailableMessage"
                     error={
-                      touched.notAvailableMessage && Boolean(errors.notAvailableMessage)
+                      touched.notAvailableMessage &&
+                      Boolean(errors.notAvailableMessage)
                     }
                     helperText={
                       touched.notAvailableMessage && errors.notAvailableMessage

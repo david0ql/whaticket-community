@@ -12,6 +12,7 @@ interface WhatsappData {
   session?: string;
   isDefault?: boolean;
   greetingMessage?: string;
+  notAvailableMessage?: string;
   farewellMessage?: string;
   queueIds?: number[];
 }
@@ -43,12 +44,13 @@ const UpdateWhatsAppService = async ({
     session,
     greetingMessage,
     farewellMessage,
+    notAvailableMessage,
     queueIds = []
   } = whatsappData;
 
   try {
     await schema.validate({ name, status, isDefault });
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 
@@ -75,7 +77,8 @@ const UpdateWhatsAppService = async ({
     session,
     greetingMessage,
     farewellMessage,
-    isDefault
+    isDefault,
+    notAvailableMessage
   });
 
   await AssociateWhatsappQueue(whatsapp, queueIds);

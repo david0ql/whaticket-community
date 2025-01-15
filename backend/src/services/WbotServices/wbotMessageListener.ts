@@ -2,6 +2,7 @@ import { join } from "path";
 import { promisify } from "util";
 import { writeFile } from "fs";
 import * as Sentry from "@sentry/node";
+import moment from "moment";
 
 import {
   Contact as WbotContact,
@@ -25,6 +26,9 @@ import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import GetContactService from "../ContactServices/GetContactService";
 import formatBody from "../../helpers/Mustache";
+import Setting from "../../models/Setting";
+import { Op } from "sequelize";
+import Whatsapp from "../../models/Whatsapp";
 
 interface Session extends Client {
   id?: number;
@@ -66,15 +70,15 @@ const verifyQuotedMessage = async (
 
 // generate random id string for file names, function got from: https://stackoverflow.com/a/1349426/1851801
 function makeRandomId(length: number) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
 }
 
 const verifyMediaMessage = async (
@@ -96,7 +100,7 @@ const verifyMediaMessage = async (
     const ext = media.mimetype.split("/")[1].split(";")[0];
     media.filename = `${randomId}-${new Date().getTime()}.${ext}`;
   } else {
-    media.filename = media.filename.split('.').slice(0,-1).join('.')+'.'+randomId+'.'+media.filename.split('.').slice(-1);
+    media.filename = media.filename.split('.').slice(0, -1).join('.') + '.' + randomId + '.' + media.filename.split('.').slice(-1);
   }
 
   try {
@@ -291,6 +295,41 @@ const handleMessage = async (
 
     const contact = await verifyContact(msgContact);
 
+    const settings = await Setting.findAll({
+      where: {
+        key: {
+          [Op.or]: ['startHour', 'endHour']
+        }
+      }
+    })
+
+    const settingsMap = settings.reduce((acc: any, setting) => {
+      acc[setting.key] = setting.value;
+      return acc;
+    }, {});
+
+    const startHour = settingsMap['startHour'];
+    const endHour = settingsMap['endHour'];
+
+    if (!startHour || !endHour) {
+      console.log("Start hour or end hour not set");
+      return
+    }
+
+    const currentTime = moment();
+    const startTime = moment(startHour, 'hh:mm A');
+    const endTime = moment(endHour, 'hh:mm A');
+
+    if (!currentTime.isBetween(startTime, endTime, undefined, '[)') && !msg.fromMe) {
+      const whatsappInstance = await Whatsapp.findByPk(wbot.id);
+
+      if (whatsappInstance) {
+        await wbot.sendMessage(`${contact.number}@c.us`, whatsapp.notAvailableMessage);
+      }
+
+      return
+    }
+
     if (
       unreadMessages === 0 &&
       whatsapp.farewellMessage &&
@@ -305,7 +344,7 @@ const handleMessage = async (
       unreadMessages,
       groupContact
     );
-    
+
     if (!msg.fromMe && ticketCreated) {
       await wbot.sendMessage(`${contact.number}@c.us`, whatsapp.greetingMessage);
     }
@@ -381,7 +420,7 @@ const handleMessage = async (
             }
           }
         }
-
+ 
         // eslint-disable-next-line no-restricted-syntax
         for await (const ob of obj) {
           try {

@@ -9,13 +9,13 @@ import Container from "@material-ui/core/Container";
 import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
 import { toast } from "react-toastify";
-import MomentUtils from "@date-io/moment";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import { TimePicker } from "@material-ui/pickers";
 
 import api from "../../services/api";
 import { i18n } from "../../translate/i18n.js";
 import toastError from "../../errors/toastError";
+import MomentUtils from '@date-io/moment';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
   paperHorizontal: {
     padding: theme.spacing(2),
     display: "flex",
+	justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
     marginBottom: 12,
@@ -57,6 +58,17 @@ const Settings = () => {
       try {
         const { data } = await api.get("/settings");
         setSettings(data);
+        data.forEach((setting) => {
+          if (setting.key === "startHour" || setting.key === "endHour") {
+            console.log(setting);
+			const result = moment(setting.value, 'hh:mm A')
+			const second = result.toDate()
+			console.log(result)
+			console.log(second)
+			console.log(result.hours(), result.minutes())
+			console.log(second.getHours(), second.getMinutes())
+          }
+        });
       } catch (err) {
         toastError(err);
       }
@@ -104,7 +116,9 @@ const Settings = () => {
 
   const handleTimeChange = async (key, date) => {
     try {
+		console.log(key, date)
       const formattedTime = moment(date).format("hh:mm A");
+	  console.log(formattedTime)
       await api.put(`/settings/${key}`, { value: formattedTime });
       toast.success(i18n.t("settings.success"));
     } catch (err) {
