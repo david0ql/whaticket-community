@@ -189,6 +189,7 @@ const messages = {
           name: "Name",
           color: "Color",
           greetingMessage: "Greeting Message",
+          notAvailableMessage: "Mensaje de no disponible",
         },
         buttons: {
           okAdd: "Add",

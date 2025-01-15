@@ -192,6 +192,7 @@ const messages = {
           name: "Nombre",
           color: "Color",
           greetingMessage: "Mensaje de saludo",
+          notAvailableMessage: "Mensaje de no disponible",
         },
         buttons: {
           okAdd: "Añadir",

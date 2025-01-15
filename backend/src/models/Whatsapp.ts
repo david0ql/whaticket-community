@@ -51,7 +51,10 @@ class Whatsapp extends Model<Whatsapp> {
   greetingMessage: string;
 
   @Column(DataType.TEXT)
-  farewellMessage: string;
+  farewellMessage: string
+
+  @Column(DataType.TEXT)
+  notAvailableMessage: string;
 
   @Default(false)
   @AllowNull
