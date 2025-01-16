@@ -30,6 +30,7 @@ import UserModal from "../../components/UserModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import toastError from "../../errors/toastError";
 import { Cancel, CheckCircle, Warning } from "@material-ui/icons";
+import moment from "moment";
 
 const reducer = (state, action) => {
   if (action.type === "LOAD_USERS") {
@@ -285,7 +286,9 @@ const Users = () => {
                   <TableCell align="center">{user.email}</TableCell>
                   <TableCell align="center">{user.profile}</TableCell>
                   <TableCell align="center">{user.whatsapp?.name}</TableCell>
-                  <TableCell align="center">{user.lastInteraction}</TableCell>
+                  <TableCell align="center">
+                    {moment(user.lastInteraction).format("DD/MM/YYYY HH:mm:ss")}
+                  </TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"
