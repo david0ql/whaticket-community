@@ -12,6 +12,7 @@ interface MessageData {
   read?: boolean;
   mediaType?: string;
   mediaUrl?: string;
+  notify: boolean;
 }
 interface Request {
   messageData: MessageData;
@@ -49,16 +50,18 @@ const CreateMessageService = async ({
     throw new Error("ERR_CREATING_MESSAGE");
   }
 
-  const io = getIO();
-  io.to(message.ticketId.toString())
-    .to(message.ticket.status)
-    .to("notification")
-    .emit("appMessage", {
-      action: "create",
-      message,
-      ticket: message.ticket,
-      contact: message.ticket.contact
-    });
+  if (messageData.notify) {
+    const io = getIO();
+    io.to(message.ticketId.toString())
+      .to(message.ticket.status)
+      .to("notification")
+      .emit("appMessage", {
+        action: "create",
+        message,
+        ticket: message.ticket,
+        contact: message.ticket.contact
+      });
+  }
 
   return message;
 };

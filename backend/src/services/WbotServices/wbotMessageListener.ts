@@ -84,7 +84,8 @@ function makeRandomId(length: number) {
 const verifyMediaMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
-  contact: Contact
+  contact: Contact,
+  notify = true
 ): Promise<Message> => {
   const quotedMsg = await verifyQuotedMessage(msg);
 
@@ -123,7 +124,8 @@ const verifyMediaMessage = async (
     read: msg.fromMe,
     mediaUrl: media.filename,
     mediaType: media.mimetype.split("/")[0],
-    quotedMsgId: quotedMsg?.id
+    quotedMsgId: quotedMsg?.id,
+    notify
   };
 
   await ticket.update({ lastMessage: msg.body || media.filename });
@@ -135,7 +137,8 @@ const verifyMediaMessage = async (
 const verifyMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
-  contact: Contact
+  contact: Contact,
+  notify = true
 ) => {
 
   if (msg.type === 'location')
@@ -150,7 +153,8 @@ const verifyMessage = async (
     fromMe: msg.fromMe,
     mediaType: msg.type,
     read: msg.fromMe,
-    quotedMsgId: quotedMsg?.id
+    quotedMsgId: quotedMsg?.id,
+    notify
   };
 
   // temporaryly disable ts checks because of type definition bug for Location object
@@ -327,7 +331,7 @@ const handleMessage = async (
       if (!currentTime.isBetween(startTime, endTime, undefined, '[)') && !msg.fromMe) {
         await Promise.all([
           wbot.sendMessage(`${contact.number}@c.us`, whatsapp.notAvailableMessage),
-          verifyMessage(msg, ticket, contact),
+          verifyMessage(msg, ticket, contact, false),
           ticket.update({ status: 'closed' })
         ]);
         return
