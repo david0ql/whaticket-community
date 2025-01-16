@@ -1,4 +1,8 @@
 FROM node:14-alpine AS build-deps
+
+ENV TZ=America/Bogota
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && dpkg-reconfigure -f noninteractive tzdata
+
 ENV NODE_OPTIONS=--max_old_space_size=3072
 ENV GENERATE_SOURCEMAP=false
 WORKDIR /usr/src/app

@@ -309,13 +309,14 @@ const handleMessage = async (
       const startTime = moment(startHour, 'hh:mm A');
       const endTime = moment(endHour, 'hh:mm A');
 
+      console.log(currentTime.isBetween(startTime, endTime, undefined, '[)'))
+      console.log(currentTime, startTime, endTime)
+
       if (!currentTime.isBetween(startTime, endTime, undefined, '[)') && !msg.fromMe) {
         await wbot.sendMessage(`${contact.number}@c.us`, whatsapp.notAvailableMessage);
         return
       }
     }
-
-
 
     if (
       unreadMessages === 0 &&
