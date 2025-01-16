@@ -295,40 +295,27 @@ const handleMessage = async (
 
     const contact = await verifyContact(msgContact);
 
-    const settings = await Setting.findAll({
-      where: {
-        key: {
-          [Op.or]: ['startHour', 'endHour']
-        }
+    const whatsappInstance = await Whatsapp.findByPk(wbot.id)
+
+    if (whatsappInstance) {
+      const startHour = whatsappInstance.startHour;
+      const endHour = whatsappInstance.endHour;
+
+      if (!startHour || !endHour) {
+        return
       }
-    })
 
-    const settingsMap = settings.reduce((acc: any, setting) => {
-      acc[setting.key] = setting.value;
-      return acc;
-    }, {});
+      const currentTime = moment();
+      const startTime = moment(startHour, 'hh:mm A');
+      const endTime = moment(endHour, 'hh:mm A');
 
-    const startHour = settingsMap['startHour'];
-    const endHour = settingsMap['endHour'];
-
-    if (!startHour || !endHour) {
-      console.log("Start hour or end hour not set");
-      return
-    }
-
-    const currentTime = moment();
-    const startTime = moment(startHour, 'hh:mm A');
-    const endTime = moment(endHour, 'hh:mm A');
-
-    if (!currentTime.isBetween(startTime, endTime, undefined, '[)') && !msg.fromMe) {
-      const whatsappInstance = await Whatsapp.findByPk(wbot.id);
-
-      if (whatsappInstance) {
+      if (!currentTime.isBetween(startTime, endTime, undefined, '[)') && !msg.fromMe) {
         await wbot.sendMessage(`${contact.number}@c.us`, whatsapp.notAvailableMessage);
+        return
       }
-
-      return
     }
+
+
 
     if (
       unreadMessages === 0 &&
