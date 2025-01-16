@@ -297,27 +297,6 @@ const handleMessage = async (
 
     const whatsappInstance = await Whatsapp.findByPk(wbot.id)
 
-    if (whatsappInstance) {
-      const startHour = whatsappInstance.startHour;
-      const endHour = whatsappInstance.endHour;
-
-      if (!startHour || !endHour) {
-        return
-      }
-
-      const currentTime = moment();
-      const startTime = moment(startHour, 'hh:mm A');
-      const endTime = moment(endHour, 'hh:mm A');
-
-      console.log(currentTime.isBetween(startTime, endTime, undefined, '[)'))
-      console.log(currentTime, startTime, endTime)
-
-      if (!currentTime.isBetween(startTime, endTime, undefined, '[)') && !msg.fromMe) {
-        await wbot.sendMessage(`${contact.number}@c.us`, whatsapp.notAvailableMessage);
-        return
-      }
-    }
-
     if (
       unreadMessages === 0 &&
       whatsapp.farewellMessage &&
@@ -332,6 +311,28 @@ const handleMessage = async (
       unreadMessages,
       groupContact
     );
+
+    if (whatsappInstance) {
+      const startHour = whatsappInstance.startHour;
+      const endHour = whatsappInstance.endHour;
+
+      if (!startHour || !endHour) {
+        return
+      }
+
+      const currentTime = moment();
+      const startTime = moment(startHour, 'hh:mm A');
+      const endTime = moment(endHour, 'hh:mm A');
+
+      if (!currentTime.isBetween(startTime, endTime, undefined, '[)') && !msg.fromMe) {
+        await Promise.all([
+          wbot.sendMessage(`${contact.number}@c.us`, whatsapp.notAvailableMessage),
+          verifyMessage(msg, ticket, contact),
+          ticket.update({ status: 'closed' })
+        ]);
+        return
+      }
+    }
 
     if (!msg.fromMe && ticketCreated) {
       await wbot.sendMessage(`${contact.number}@c.us`, whatsapp.greetingMessage);
