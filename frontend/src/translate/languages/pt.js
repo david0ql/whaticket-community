@@ -351,6 +351,7 @@ const messages = {
           profile: "Perfil",
           whatsapp: "Conexão Padrão",
           actions: "Ações",
+          lastInteraction: "Última interação",
         },
         buttons: {
           add: "Adicionar usuário",

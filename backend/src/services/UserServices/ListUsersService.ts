@@ -43,11 +43,11 @@ const ListUsersService = async ({
 
   const usersWithFinalState = await Promise.all(
     users.map(async (user) => {
+      const lastInteraction = await Interaction.findOne({
+        where: { userId: user.id },
+        order: [["createdAt", "DESC"]],
+      });
       if (user.isConnected === 1) {
-        const lastInteraction = await Interaction.findOne({
-          where: { userId: user.id },
-          order: [["createdAt", "DESC"]],
-        });
 
         if (lastInteraction) {
           const lastInteractionTime = new Date(lastInteraction.createdAt).getTime();
@@ -55,13 +55,18 @@ const ListUsersService = async ({
           const timeDifferenceInSeconds = (currentTime - lastInteractionTime) / 1000;
 
           if (timeDifferenceInSeconds > 120) {
-            return { ...user.toJSON(), finalIsConnected: 3 };
+            return {
+              ...user.toJSON(),
+              lastInteraction: lastInteraction.createdAt,
+              finalIsConnected: 3
+            };
           }
         }
       }
 
       return {
         ...user.toJSON(),
+        lastInteraction: lastInteraction ? lastInteraction.createdAt : null,
         finalIsConnected: user.isConnected,
       };
     })

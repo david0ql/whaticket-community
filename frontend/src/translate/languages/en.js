@@ -347,6 +347,7 @@ const messages = {
           profile: "Profile",
           whatsapp: "Default Connection",
           actions: "Actions",
+          lastInteraction: "Last Interaction",
         },
         buttons: {
           add: "Add user",

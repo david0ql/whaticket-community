@@ -250,6 +250,9 @@ const Users = () => {
                 {i18n.t("users.table.whatsapp")}
               </TableCell>
               <TableCell align="center">
+                {i18n.t("users.table.lastInteraction")}
+              </TableCell>
+              <TableCell align="center">
                 {i18n.t("users.table.actions")}
               </TableCell>
             </TableRow>
@@ -282,6 +285,7 @@ const Users = () => {
                   <TableCell align="center">{user.email}</TableCell>
                   <TableCell align="center">{user.profile}</TableCell>
                   <TableCell align="center">{user.whatsapp?.name}</TableCell>
+                  <TableCell align="center">{user.lastInteraction}</TableCell>
                   <TableCell align="center">
                     <IconButton
                       size="small"
