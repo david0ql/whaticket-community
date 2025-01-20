@@ -330,6 +330,7 @@ const messages = {
           shortcut: "Atajo",
           message: "Respuesta rápida",
           actions: "Acciones",
+          whatsapp: "WhatsApp",
         },
         buttons: {
           add: "Agregar respuesta rápida",

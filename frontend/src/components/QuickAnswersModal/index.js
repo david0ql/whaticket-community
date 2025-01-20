@@ -11,6 +11,8 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  Select,
+  MenuItem,
   DialogTitle,
   CircularProgress,
 } from "@material-ui/core";
@@ -155,11 +157,17 @@ const QuickAnswersModal = ({
             <Form>
               <DialogContent dividers>
                 <div className={classes.textQuickAnswerContainer}>
+                  <Select
+                    fullWidth
+                    autoFocus
+                    label={i18n.t("quickAnswers.table.whatsapp")}
+                  >
+                    <MenuItem value={""}>&nbsp;</MenuItem>
+                  </Select>
                   <Field
                     as={TextField}
                     label={i18n.t("quickAnswersModal.form.shortcut")}
                     name="shortcut"
-                    autoFocus
                     error={touched.shortcut && Boolean(errors.shortcut)}
                     helperText={touched.shortcut && errors.shortcut}
                     variant="outlined"

@@ -319,24 +319,36 @@ const handleMessage = async (
     if (whatsappInstance) {
       const startHour = whatsappInstance.startHour;
       const endHour = whatsappInstance.endHour;
+      const startHourWeekend = whatsappInstance.startHourWeekend;
+      const endHourWeekend = whatsappInstance.endHourWeekend;
 
-      if (!startHour || !endHour) {
-        return
+      if (!startHour || !endHour || !startHourWeekend || !endHourWeekend) {
+        return;
       }
 
       const currentTime = moment();
-      const startTime = moment(startHour, 'hh:mm A');
-      const endTime = moment(endHour, 'hh:mm A');
+      let startTime, endTime;
+
+      const isWeekend = currentTime.isoWeekday() === 6 || currentTime.isoWeekday() === 7;
+
+      if (isWeekend) {
+        startTime = moment(startHourWeekend, 'hh:mm A');
+        endTime = moment(endHourWeekend, 'hh:mm A');
+      } else {
+        startTime = moment(startHour, 'hh:mm A');
+        endTime = moment(endHour, 'hh:mm A');
+      }
 
       if (!currentTime.isBetween(startTime, endTime, undefined, '[)') && !msg.fromMe) {
         await Promise.all([
           wbot.sendMessage(`${contact.number}@c.us`, whatsapp.notAvailableMessage),
           verifyMessage(msg, ticket, contact, false),
-          ticket.update({ status: 'closed' })
+          ticket.update({ status: 'closed' }),
         ]);
-        return
+        return;
       }
     }
+
 
     if (!msg.fromMe && ticketCreated) {
       await wbot.sendMessage(`${contact.number}@c.us`, whatsapp.greetingMessage);

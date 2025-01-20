@@ -25,11 +25,13 @@ export const update = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const token: string = req.cookies.jrt;
+  let token: string = req.headers["authorization"] as string;
 
   if (!token) {
     throw new AppError("ERR_SESSION_EXPIRED", 401);
   }
+
+  token = token.split(" ")[1];
 
   const { user, newToken, refreshToken } = await RefreshTokenService(
     res,

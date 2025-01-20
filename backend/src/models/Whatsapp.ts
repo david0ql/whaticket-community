@@ -16,6 +16,7 @@ import {
 import Queue from "./Queue";
 import Ticket from "./Ticket";
 import WhatsappQueue from "./WhatsappQueue";
+import QuickAnswer from "./QuickAnswer";
 
 @Table
 class Whatsapp extends Model<Whatsapp> {
@@ -62,10 +63,19 @@ class Whatsapp extends Model<Whatsapp> {
   @Column(DataType.TEXT)
   endHour: string;
 
+  @Column(DataType.TEXT)
+  startHourWeekend: string;
+
+  @Column(DataType.TEXT)
+  endHourWeekend: string;
+
   @Default(false)
   @AllowNull
   @Column
   isDefault: boolean;
+
+  @HasMany(() => QuickAnswer)
+  quickAnswers: QuickAnswer[];
 
   @CreatedAt
   createdAt: Date;

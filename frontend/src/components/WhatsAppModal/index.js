@@ -70,6 +70,8 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
     notAvailableMessage: "",
     startHour: "",
     endHour: "",
+    startHourWeekend: "",
+    endHourWeekend: "",
     isDefault: false,
   };
   const [whatsApp, setWhatsApp] = useState(initialState);
@@ -220,32 +222,95 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                       margin="dense"
                     />
                   </div>
-                  <TimePicker
-                    name="startHour"
-                    label="Hora de entrada"
-                    margin="dense"
-                    variant="outlined"
-                    value={
-                      whatsApp &&
-                      whatsApp.startHour.length > 0 &&
-                      moment(getSettingValue("startHour"), "hh:mm A").toDate()
-                    }
-                    onChange={(date) => handleTimeChange("startHour", date)}
-                    ampm
-                  />
-                  <TimePicker
-                    name="endHour"
-                    label="Hora de finalización"
-                    margin="dense"
-                    variant="outlined"
-                    value={
-                      whatsApp &&
-                      whatsApp.endHour.length > 0 &&
-                      moment(getSettingValue("endHour"), "hh:mm A").toDate()
-                    }
-                    onChange={(date) => handleTimeChange("endHour", date)}
-                    ampm
-                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: "16px",
+                      height: "100%",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        flex: 1,
+                        gap: "8px",
+                      }}
+                    >
+                      <span>Horario de atención Lunes a Viernes</span>
+                      <TimePicker
+                        name="startHour"
+                        label="Hora de entrada LU-VI"
+                        margin="dense"
+                        variant="outlined"
+                        value={
+                          whatsApp &&
+                          whatsApp.startHour.length > 0 &&
+                          moment(
+                            getSettingValue("startHour"),
+                            "hh:mm A"
+                          ).toDate()
+                        }
+                        onChange={(date) => handleTimeChange("startHour", date)}
+                        ampm
+                      />
+                      <TimePicker
+                        name="endHour"
+                        label="Hora de finalización LU-VI"
+                        margin="dense"
+                        variant="outlined"
+                        value={
+                          whatsApp &&
+                          whatsApp.endHour.length > 0 &&
+                          moment(getSettingValue("endHour"), "hh:mm A").toDate()
+                        }
+                        onChange={(date) => handleTimeChange("endHour", date)}
+                        ampm
+                      />
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        flex: 1,
+                        gap: "8px",
+                      }}
+                    >
+                      <span>Horario de atención Sábado y Domingo</span>
+                      <TimePicker
+                        name="startHourWeekend"
+                        label="Hora de entrada SAB-DOM"
+                        margin="dense"
+                        variant="outlined"
+                        value={
+                          whatsApp &&
+                          whatsApp.startHourWeekend.length > 0 &&
+                          moment(
+                            getSettingValue("startHourWeekend"),
+                            "hh:mm A"
+                          ).toDate()
+                        }
+                        onChange={(date) => handleTimeChange("startHourWeekend", date)}
+                        ampm
+                      />
+                      <TimePicker
+                        name="endHourWeekend"
+                        label="Hora de finalización SAB-DOM"
+                        margin="dense"
+                        variant="outlined"
+                        value={
+                          whatsApp &&
+                          whatsApp.endHourWeekend.length > 0 &&
+                          moment(getSettingValue("endHourWeekend"), "hh:mm A").toDate()
+                        }
+                        onChange={(date) => handleTimeChange("endHourWeekend", date)}
+                        ampm
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <Field
                       as={TextField}
