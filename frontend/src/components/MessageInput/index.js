@@ -326,10 +326,12 @@ const MessageInput = ({ ticketStatus }) => {
   const handleLoadQuickAnswer = async (value) => {
     if (value && value.indexOf("/") === 0) {
       try {
-        const { data } = await api.get("/quickAnswers/", {
+        const { data } = await api.get(`/quickAnswers/ticket/${ticketId}`, {
           params: { searchParam: inputMessage.substring(1) },
         });
+
         setQuickAnswer(data.quickAnswers);
+
         if (data.quickAnswers.length > 0) {
           setTypeBar(true);
         } else {

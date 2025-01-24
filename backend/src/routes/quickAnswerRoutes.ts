@@ -13,6 +13,12 @@ quickAnswerRoutes.get(
   QuickAnswerController.show
 );
 
+quickAnswerRoutes.get(
+  "/quickAnswers/ticket/:ticketId",
+  isAuth,
+  QuickAnswerController.showByTicket
+);
+
 quickAnswerRoutes.post("/quickAnswers", isAuth, QuickAnswerController.store);
 
 quickAnswerRoutes.put(

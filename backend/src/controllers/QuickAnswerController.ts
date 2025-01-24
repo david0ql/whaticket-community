@@ -9,6 +9,7 @@ import UpdateQuickAnswerService from "../services/QuickAnswerService/UpdateQuick
 import DeleteQuickAnswerService from "../services/QuickAnswerService/DeleteQuickAnswerService";
 
 import AppError from "../errors/AppError";
+import ShowByTicketQuickAnswerService from "../services/QuickAnswerService/ShowByTicketQuickAnswerService";
 
 type IndexQuery = {
   searchParam: string;
@@ -41,7 +42,7 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 
   try {
     await QuickAnswerSchema.validate(newQuickAnswer);
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 
@@ -66,6 +67,15 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(quickAnswer);
 };
 
+export const showByTicket = async (req: Request, res: Response): Promise<Response> => {
+  const { searchParam, pageNumber } = req.query as IndexQuery;
+  const { ticketId } = req.params;
+
+  const { count, hasMore, quickAnswers } = await ShowByTicketQuickAnswerService(ticketId, searchParam, pageNumber);
+
+  return res.status(200).json({ quickAnswers, count, hasMore });
+};
+
 export const update = async (
   req: Request,
   res: Response
@@ -79,7 +89,7 @@ export const update = async (
 
   try {
     await schema.validate(quickAnswerData);
-  } catch (err) {
+  } catch (err: any) {
     throw new AppError(err.message);
   }
 
