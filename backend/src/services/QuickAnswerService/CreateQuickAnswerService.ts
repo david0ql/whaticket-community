@@ -4,11 +4,13 @@ import QuickAnswer from "../../models/QuickAnswer";
 interface Request {
   shortcut: string;
   message: string;
+  whatsappId: number;
 }
 
 const CreateQuickAnswerService = async ({
   shortcut,
-  message
+  message,
+  whatsappId
 }: Request): Promise<QuickAnswer> => {
   const nameExists = await QuickAnswer.findOne({
     where: { shortcut }
@@ -18,7 +20,7 @@ const CreateQuickAnswerService = async ({
     throw new AppError("ERR__SHORTCUT_DUPLICATED");
   }
 
-  const quickAnswer = await QuickAnswer.create({ shortcut, message });
+  const quickAnswer = await QuickAnswer.create({ shortcut, message, whatsappId });
 
   return quickAnswer;
 };

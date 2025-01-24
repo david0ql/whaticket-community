@@ -168,6 +168,7 @@ const messages = {
         title: {
           add: "Add Quick Reply",
           edit: "Edit Quick Answer",
+          whatsappId: "WhatsApp",
         },
         form: {
           shortcut: "Shortcut",

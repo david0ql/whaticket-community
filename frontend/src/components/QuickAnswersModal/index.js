@@ -57,6 +57,7 @@ const QuickAnswerSchema = Yup.object().shape({
     .min(8, "Too Short!")
     .max(30000, "Too Long!")
     .required("Required"),
+  whatsappId: Yup.string().required("Required"),
 });
 
 const QuickAnswersModal = ({
@@ -72,9 +73,11 @@ const QuickAnswersModal = ({
   const initialState = {
     shortcut: "",
     message: "",
+    whatsappId: "",
   };
 
   const [quickAnswer, setQuickAnswer] = useState(initialState);
+  const [whatsapps, setWhatsapps] = useState([]);
 
   useEffect(() => {
     return () => {
@@ -102,7 +105,19 @@ const QuickAnswersModal = ({
       }
     };
 
+    const fetchWhatsapp = async () => {
+      try {
+        const { data } = await api.get("/whatsapp");
+        if (isMounted.current) {
+          setWhatsapps(data);
+        }
+      } catch (err) {
+        toastError(err);
+      }
+    };
+
     fetchQuickAnswer();
+    fetchWhatsapp();
   }, [quickAnswerId, open, initialValues]);
 
   const handleClose = () => {
@@ -159,10 +174,23 @@ const QuickAnswersModal = ({
                 <div className={classes.textQuickAnswerContainer}>
                   <Select
                     fullWidth
+                    onChange={(e) => {
+                      values.whatsappId = e.target.value;
+                    }}
                     autoFocus
-                    label={i18n.t("quickAnswers.table.whatsapp")}
+                    variant="outlined"
+                    value={values.whatsappId}
+                    margin="dense"
+                    error={touched.whatsappId && Boolean(errors.whatsappId)}
+                    helperText={touched.whatsappId && errors.whatsappId}
+                    name="whatsappId"
+                    label={i18n.t("quickAnswersModal.form.whatsappId")}
                   >
-                    <MenuItem value={""}>&nbsp;</MenuItem>
+                    {whatsapps.map((whatsapp) => (
+                      <MenuItem key={whatsapp.id} value={whatsapp.id}>
+                        {whatsapp.name}
+                      </MenuItem>
+                    ))}
                   </Select>
                   <Field
                     as={TextField}

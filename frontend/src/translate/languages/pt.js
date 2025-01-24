@@ -170,6 +170,7 @@ const messages = {
         title: {
           add: "Adicionar Resposta Rápida",
           edit: "Editar Resposta Rápida",
+          whatsappId: "WhatsApp",
         },
         form: {
           shortcut: "Atalho",
